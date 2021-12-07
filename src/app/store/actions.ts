@@ -4,8 +4,7 @@ export const offline = createAction('connection-offline')
 export const online = createAction('connection-online')
 export const slow = createAction('connection-slow')
 export const connectionStatus = createAction(
-    '[Connectivity] Check',
-    props<{ rtt: number }>()
+    '[Connectivity] Check'
 );
 
 export const connectionChange = createAction(

@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Observer, Subscription } from 'rxjs';
 import { ConnectionState } from '../store';
 import { online, connectionStatus, connectionChange } from '../store/actions';
+import { selectConnectivity } from '../store/selectors'
 export declare var navigator: any;
 
 @Component({
@@ -10,14 +11,19 @@ export declare var navigator: any;
   templateUrl: './connection.component.html',
   styleUrls: ['./connection.component.css']
 })
-export class ConnectionComponent implements OnInit {
+export class ConnectionComponent implements OnInit, OnChanges {
   rtt: number = 0;
+  rtt1: number = 0;
   temp: any;
+  textfield: any
 
   connectionStatus$: any;
+  connectionState$ = this.store.select(selectConnectivity)
+
 
   connectionSubscription: Subscription | any;
   constructor(private store: Store<{ appState: ConnectionState }>) { }
+
 
 
   connection$() {
@@ -41,8 +47,28 @@ export class ConnectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkConnection();
-    //this.checkStatus();
+    // this.checkStatus();
+    // this.store.select(selectConnectivity).toPromise().then((data) => {
+    //   console.log(data)
+    // })
+    // setInterval(() => {
+    //   this.checkStatus();
+    // }, 1000);
 
+  }
+  ngOnChanges(): void {
+    // const x = this.store.select(selectConnectivity).subscribe(data => {
+    //   // console.log(data)
+    //   const data1 = JSON.parse(JSON.stringify(data))
+    //   this.rtt = data1['rtt'];
+
+    //   console.log('RTT: ', this.rtt)
+    // })
+    // console.log(x)
+  }
+  ngDoCheck() {
+    console.log('okkk')
+    this.rtt1 = this.rtt
   }
 
   checkStatus() {
@@ -50,18 +76,35 @@ export class ConnectionComponent implements OnInit {
     //   console.log(data)
     //   this.rtt = data.rtt;
     // })
-    this.connectionStatus$ = this.store.select('appState');
-    this.temp = this.connectionStatus$.actionsObserver._value.rtt;
-    console.log(this.temp);
+    // this.connectionStatus$ = this.store.select('appState');
+    // this.temp = this.connectionStatus$.actionsObserver._value.rtt;
+    // console.log(this.temp);
+
+    this.store.select(selectConnectivity).subscribe(data => {
+      console.log(data)
+      const data1 = JSON.parse(JSON.stringify(data))
+      // this.rtt = data1['rtt'];
+      this.changeRtt(data1.rtt)
+      // console.log('RTT: ', this.rtt)
+    })
+  }
+  changeRtt(rtt: any) {
+    console.log(rtt)
+    this.rtt = rtt
+    // alert(rtt)
   }
 
-  ngOnDestroy() {
-    if (this.connectionSubscription) {
-      this.connectionSubscription.unsubscribe();
-    }
+  // ngOnDestroy() {
+  //   if (this.connectionSubscription) {
+  //     this.connectionSubscription.unsubscribe();
+  //   }
 
+  // }
+
+  btnClick() {
+    const val = { rtt: this.textfield }
+    this.store.dispatch(connectionChange(val))
   }
-
 
 
   checkConnection() {
@@ -72,13 +115,14 @@ export class ConnectionComponent implements OnInit {
       return;
     }
     this.connection$().subscribe((rtt: number) => {
+      console.log('connection changed')
       const val = { rtt }
       this.store.dispatch(connectionChange(val))
     });
 
-    this.connectionStatus$ = this.store.select('appState');
-    this.temp = this.connectionStatus$.actionsObserver._value.rtt;
-    console.log(this.temp);
+    // this.connectionStatus$ = this.store.select('appState');
+    // this.temp = this.connectionStatus$.actionsObserver._value.rtt;
+    // console.log(this.temp);
   }
 }
 

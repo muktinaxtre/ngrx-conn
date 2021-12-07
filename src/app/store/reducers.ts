@@ -3,11 +3,9 @@ import { initialState } from ".";
 import { connectionStatus, offline, online, slow, connectionChange, goodConnection } from "./actions";
 
 const _connectionReducer = createReducer(initialState,
-    on(connectionStatus, (state, { rtt }) => {
+    on(connectionStatus, (state) => {
         return {
-            ...state,
-            rtt: rtt,
-            status: 'Checking'
+            ...state
         }
     }),
     on(connectionChange, (state, data) => {

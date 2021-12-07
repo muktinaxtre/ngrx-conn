@@ -1,2 +1,8 @@
 <p>connection works!</p>
-{{ temp }}
+{{ rtt }}
+
+<div>
+    Connection State: {{connectionState$ |async}}
+</div>
+<input type="number" [(ngModel)]="textfield">
+<button (click)="btnClick()">Click to test</button>
